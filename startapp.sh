@@ -8,11 +8,12 @@ if ! [ -f /smbserver/group ]; then
 else
     cp -pf /smbserver/group /etc/group
 fi
-if ! [ -f /smbserver/shadow ]; then
+if ! [ -f /smbserver/shadow ] || ! [ -f /smbserver/passwd ]; then
     adduser --no-create-home --quiet --uid 33 --gid 33 --disabled-login --force-badname --gecos www-data www-data
     adduser --no-create-home --quiet --uid 65534 --gid 65534 --disabled-login --force-badname --gecos nobody nobody
 else
     cp -pf /smbserver/shadow /etc/shadow
+    cp -pf /smbserver/passwd /etc/passwd
 fi
 if [ -d /smbserver/samba ]; then
     cp -prf /smbserver/samba /etc/samba 
@@ -25,6 +26,8 @@ backup_important_files() {
     cp -p /etc/group /smbserver/group
     rm -f /smbserver/shadow
     cp -p /etc/shadow /smbserver/shadow 
+    rm -f /smbserver/passwd
+    cp -p /etc/passwd /smbserver/passwd 
     rm -rf /smbserver/samba
     cp -pr /etc/samba /smbserver/samba
     set +x
