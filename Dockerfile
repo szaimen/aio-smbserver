@@ -1,40 +1,46 @@
-FROM jlesage/baseimage-gui:alpine-3.21-v4
+FROM jlesage/baseimage-gui:ubuntu-24.04-v4
 
 COPY --chmod=775 startapp.sh /startapp.sh
+ADD https://raw.githubusercontent.com/nextcloud/vm/refs/heads/main/static/fetch_lib.sh /var/scripts/fetch_lib.sh
+ADD https://raw.githubusercontent.com/nextcloud/vm/main/lib.sh /var/scripts/lib.sh
+ADD https://patch-diff.githubusercontent.com/raw/szaimen/vm/pull/1.patch /smbserver.patch
+ADD https://raw.githubusercontent.com/nextcloud/vm/refs/heads/main/not-supported/smbserver.sh /smbserver.sh
+COPY supervisord.conf /supervisord.conf
 
 # Set the name of the application.
-RUN set-cont-env APP_NAME "Nextcloud AIO Borg Backup Viewer"
+RUN set-cont-env APP_NAME "Nextcloud AIO SMB Server"
 
 # hadolint ignore=DL3002
 USER root
 
 ENV USER_ID=0 \
     GROUP_ID=0 \
-    WEB_AUDIO=1 \
     WEB_AUTHENTICATION=1 \
     SECURE_CONNECTION=1 \
-    HOME=/root
+    WEB_LISTENING_PORT=5803
 
-# hadolint ignore=DL3018
+# hadolint ignore=DL3008,DL3003
 RUN set -ex; \
     \
-    apk upgrade --no-cache -a; \
-    apk add --no-cache \
-        util-linux-misc \
-        bash \
-        borgbackup \
-        rsync \
-        fuse \
-        py3-llfuse \
-        alpine-conf \
-        nautilus \
+    apt-get update; \
+    apt-get upgrade -y; \
+    apt-get install -y --no-install-recommends \
+        whiptail \
+        samba \
+        cpuid \
+        curl \
         xterm \
-        eog \
-        gedit \
-        vlc \
-        font-terminus font-inconsolata font-dejavu font-noto font-noto-cjk font-awesome font-noto-extra font-liberation; \
-    setup-desktop gnome; \
-    rc-update add apk-polkit-server default
-# TODO: add further dependencies like e.g. grsync onlyoffice-desktopeditors
-# https://gitlab.alpinelinux.org/alpine/aports/-/issues/16847
-# https://gitlab.alpinelinux.org/alpine/aports/-/issues/14535
+        lsb-release \
+        iproute2 \
+        adduser \
+        git \
+        supervisor \
+    ; \
+    rm -rf /var/lib/apt/lists/*; \
+    chmod +x /startapp.sh; \
+    mkdir -p /var/log/supervisord /var/run/supervisord; \
+    cd /; \
+    sed -i 's|not-supported/||g' /smbserver.patch; \
+    git apply /smbserver.patch
+
+VOLUME /smbserver
