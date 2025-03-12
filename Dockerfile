@@ -35,6 +35,7 @@ RUN set -ex; \
         adduser \
         git \
         supervisor \
+        rsync \
     ; \
     rm -rf /var/lib/apt/lists/*; \
     chmod +x /startapp.sh; \

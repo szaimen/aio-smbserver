@@ -16,7 +16,7 @@ else
     cp -pf /smbserver/passwd /etc/passwd
 fi
 if [ -d /smbserver/samba ]; then
-    cp -prf /smbserver/samba /etc/samba 
+    rsync -a --delete /smbserver/samba/ /etc/samba/ 
 fi
 set +x
 
@@ -28,8 +28,8 @@ backup_important_files() {
     cp -p /etc/shadow /smbserver/shadow 
     rm -f /smbserver/passwd
     cp -p /etc/passwd /smbserver/passwd 
-    rm -rf /smbserver/samba
-    cp -pr /etc/samba /smbserver/samba
+    mkdir -p /smbserver/samba/
+    rsync -a --delete /etc/samba/ /smbserver/samba/
     set +x
 }
 
