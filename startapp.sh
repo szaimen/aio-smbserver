@@ -9,7 +9,7 @@ else
     cp -pf /smbserver/group /etc/group
 fi
 if ! [ -f /smbserver/shadow ]; then
-    adduser --no-create-home --quiet --uid 65534 --gid 65534 --disabled-login --force-badname --gecos www-data www-data
+    adduser --no-create-home --quiet --uid 33 --gid 33 --disabled-login --force-badname --gecos www-data www-data
     adduser --no-create-home --quiet --uid 65534 --gid 65534 --disabled-login --force-badname --gecos nobody nobody
 else
     cp -pf /smbserver/shadow /etc/shadow
