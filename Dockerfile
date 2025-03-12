@@ -38,6 +38,7 @@ RUN set -ex; \
     ; \
     rm -rf /var/lib/apt/lists/*; \
     chmod +x /startapp.sh; \
+    mkdir -p /var/log/supervisord /var/run/supervisord; \
     cd /; \
     sed -i 's|not-supported/||g' /smbserver.patch; \
     git apply /smbserver.patch
