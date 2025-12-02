@@ -35,8 +35,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
-          # Currently only for amd64 as the package cpuid is not available on arm64
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           context: './'
           no-cache: true
           file: 'Dockerfile'
