@@ -27,7 +27,6 @@ RUN set -ex; \
     apt-get install -y --no-install-recommends \
         whiptail \
         samba \
-        cpuid \
         curl \
         xterm \
         lsb-release \
