@@ -21,6 +21,19 @@ fi
 if [ -d /smbserver/samba ]; then
     rsync -a --delete /smbserver/samba/ /etc/samba/ 
 fi
+# Never fall back to guest access for an unknown/bad Windows account.
+# The distro-packaged Samba default ("map to guest = bad user") makes smbd
+# attempt a guest session instead of cleanly rejecting the connection. That
+# guest-session setup crashes smbd (NT_STATUS_CONNECTION_RESET) instead of
+# returning a clean auth failure, so Windows clients never see a
+# credentials prompt and just get a generic network error (0x80004005).
+if [ -f /etc/samba/smb.conf ]; then
+    if grep -q "map to guest =" /etc/samba/smb.conf; then
+        sed -i 's|.*map to guest =.*|   map to guest = never|' /etc/samba/smb.conf
+    else
+        sed -i '/\[global\]/a map to guest = never' /etc/samba/smb.conf
+    fi
+fi
 set +x
 
 backup_important_files() {
