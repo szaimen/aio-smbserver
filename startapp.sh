@@ -21,6 +21,15 @@ fi
 if [ -d /smbserver/samba ]; then
     rsync -a --delete /smbserver/samba/ /etc/samba/ 
 fi
+# Ubuntu ships "map to guest = bad user", overriding Samba's own "never" default.
+# The resulting guest session for an unknown user crashes smbd, so force it back.
+if [ -f /etc/samba/smb.conf ]; then
+    if grep -q "map to guest =" /etc/samba/smb.conf; then
+        sed -i 's|.*map to guest =.*|   map to guest = never|' /etc/samba/smb.conf
+    else
+        sed -i '/\[global\]/a map to guest = never' /etc/samba/smb.conf
+    fi
+fi
 set +x
 
 backup_important_files() {
