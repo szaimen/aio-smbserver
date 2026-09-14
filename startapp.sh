@@ -21,12 +21,8 @@ fi
 if [ -d /smbserver/samba ]; then
     rsync -a --delete /smbserver/samba/ /etc/samba/ 
 fi
-# Never fall back to guest access for an unknown/bad Windows account.
-# The distro-packaged Samba default ("map to guest = bad user") makes smbd
-# attempt a guest session instead of cleanly rejecting the connection. That
-# guest-session setup crashes smbd (NT_STATUS_CONNECTION_RESET) instead of
-# returning a clean auth failure, so Windows clients never see a
-# credentials prompt and just get a generic network error (0x80004005).
+# Ubuntu ships "map to guest = bad user", overriding Samba's own "never" default.
+# The resulting guest session for an unknown user crashes smbd, so force it back.
 if [ -f /etc/samba/smb.conf ]; then
     if grep -q "map to guest =" /etc/samba/smb.conf; then
         sed -i 's|.*map to guest =.*|   map to guest = never|' /etc/samba/smb.conf
