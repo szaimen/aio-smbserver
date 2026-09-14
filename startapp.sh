@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -x
+# /var/log is a symlink into the /config volume, so this must happen at runtime.
+mkdir -p /var/log/supervisord /var/run/supervisord
 if ! [ -f /smbserver/group ]; then
     groupadd -g 33 www-data
     groupadd -g 65534 nobody

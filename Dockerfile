@@ -10,9 +10,6 @@ COPY supervisord.conf /supervisord.conf
 # Set the name of the application.
 RUN set-cont-env APP_NAME "Nextcloud AIO SMB Server"
 
-# hadolint ignore=DL3002
-USER root
-
 ENV USER_ID=0 \
     GROUP_ID=0 \
     WEB_AUTHENTICATION=1 \
@@ -22,9 +19,7 @@ ENV USER_ID=0 \
 # hadolint ignore=DL3008,DL3003
 RUN set -ex; \
     \
-    apt-get update; \
-    apt-get upgrade -y; \
-    apt-get install -y --no-install-recommends \
+    add-pkg \
         whiptail \
         samba \
         curl \
@@ -37,9 +32,7 @@ RUN set -ex; \
         rsync \
         samba-vfs-modules \
     ; \
-    rm -rf /var/lib/apt/lists/*; \
     chmod +x /startapp.sh; \
-    mkdir -p /var/log/supervisord /var/run/supervisord; \
     cd /; \
     sed -i 's|not-supported/||g' /smbserver.patch; \
     git apply /smbserver.patch
