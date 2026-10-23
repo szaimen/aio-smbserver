@@ -18,6 +18,8 @@ ENV USER_ID=0 \
 
 # hadolint ignore=DL3008,DL3003
 RUN set -ex; \
+    apt-get update; \
+    apt-get upgrade -y; \
     \
     add-pkg \
         whiptail \
