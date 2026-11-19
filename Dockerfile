@@ -18,6 +18,8 @@ ENV USER_ID=0 \
 
 # hadolint ignore=DL3008,DL3003
 RUN set -ex; \
+    # /var/log is a symlink to /config/log in the base image, which does not exist at build time
+    mkdir -p /config/log; \
     apt-get update; \
     apt-get upgrade -y; \
     rm -rf /var/lib/apt/lists/*; \
@@ -38,7 +40,8 @@ RUN set -ex; \
     chmod +x /startapp.sh; \
     cd /; \
     sed -i 's|not-supported/||g' /smbserver.patch; \
-    git apply /smbserver.patch
+    git apply /smbserver.patch; \
+    rm -rf /config/log
 
 VOLUME /smbserver
 
